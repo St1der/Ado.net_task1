@@ -20,24 +20,29 @@ namespace WpfApp10
             {
                 cs = ConfigurationManager.ConnectionStrings["myconn"].ConnectionString;
                 conn.ConnectionString = cs;
-                conn.Open();
-                string deleteQuery = "DELETE FROM Authors WHERE  Id = @id  AND Firstname = @firstName AND Lastname = @lastName";
 
-                using (SqlCommand command = new SqlCommand(deleteQuery, conn))
-                {
-                    command.Parameters.AddWithValue("@id", idtextbox.Text);
-                    command.Parameters.AddWithValue("@firstName", firstnametextbox.Text);
-                    command.Parameters.AddWithValue("@lastName", lastnametextbox.Text);
-                    int rowsAffected = command.ExecuteNonQuery();
-                    if (rowsAffected > 0)MessageBox.Show("melumat artiq silinib.");
-                    else MessageBox.Show("melumat tapila bilmedi.");   
-                }
-                conn.Close();
+                string deleteQuery = "DELETE FROM Authors WHERE Id = @id AND Firstname = @firstName AND Lastname = @lastName";
+                SqlDataAdapter adapter = new SqlDataAdapter(deleteQuery, conn);
+
+                adapter.SelectCommand.Parameters.AddWithValue("@id", idtextbox.Text);
+                adapter.SelectCommand.Parameters.AddWithValue("@firstName", firstnametextbox.Text);
+                adapter.SelectCommand.Parameters.AddWithValue("@lastName", lastnametextbox.Text);
+
+                DataTable dataTable = new DataTable();
+                adapter.Fill(dataTable);
+
+                int rowsAffected = dataTable.Rows.Count;
+
+                if (rowsAffected > 0)
+                    MessageBox.Show("melumat artiq silinib.");
+                else
+                    MessageBox.Show("melumat tapila bilmedi.");
             }
 
             idtextbox.Clear();
             firstnametextbox.Clear();
             lastnametextbox.Clear();
+
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
